@@ -1,6 +1,5 @@
 package com.tango.a01_geoquiz;
 
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -39,6 +39,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
 
         setContentView(R.layout.activity_main);
+
+        /* onCreate 处检查是否有之前保存的值
+         * 在Bundle中存储和恢复的数据类型只能是基本类型, 以及可以实现 Serializable或Parcelable接口的对象
+         * 常见的做法: 覆盖 onSaveInstanceState(Bundle)方法，
+         * 在Bundle对象中，保存当前activity的小的或
+         * 暂存状态的数据;覆盖onStop()方法，保存永久性数据，如用户编辑的文字等。
+         * onStop()方法调用完，activity 随时会被系统销毁，所以用它保存永久性数据。
+         */
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
 
         mQuestionTextView = findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +118,15 @@ public class MainActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() called");
+    }
+
+    @Override
+    // 在屏幕发生旋转之前, 先保存 currentIndex
+    // 此处方法位置也好
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
     @Override
